@@ -5,12 +5,11 @@ export interface Appstates {
 }
 
 export interface CustomHttpResponse<T> {
-  timestamp: Date;
+  timestamp?: Date;
   statusCode: number;
   status: string;
-  message: string;
+  message?: string;
   reason?: string;
-  developerMessage?: string;
   data?: T;
 }
 
