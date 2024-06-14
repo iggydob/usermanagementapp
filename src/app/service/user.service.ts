@@ -7,12 +7,6 @@ import {Observable} from "rxjs";
   providedIn: 'root'
 })
 
-// ${this.server}/users/create
-// ${this.server}/users/{email}
-// ${this.server}/users/delete
-// ${this.server}/users
-// ${this.server}/update
-
 export class UserService {
   private readonly server: string = 'http://localhost:8080';
 
