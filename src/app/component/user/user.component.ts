@@ -1,33 +1,60 @@
-import {Component} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+
+import { User } from '../../interface/user';
 import {UserService} from "../../service/user.service";
-import {Router} from "@angular/router";
-import {DataState} from "../../enum/datastate.enum";
-import {catchError, map, of, startWith} from "rxjs";
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
-  styleUrl: './user.component.css'
+  styleUrls: ['./user.component.css']
 })
+export class UserComponent implements OnInit {
+  users: User[] = [];
+  selectedUser: User | null = null;
 
-export class UserComponent {
-  constructor(private router: Router, userService: UserService) {
-  }
+  constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.homeState$ = this.customerService.customers$()
-      .pipe(
-        map(response => {
-          return {dataState: DataState.LOADED, appData: response};
-        }),
-        startWith({dataState: DataState.LOADING}),
-        catchError((error: string) => {
-          return of({dataState: DataState.ERROR, error})
-        })
-      )
+    this.loadAllUsers();
   }
 
-  selectCustomer(customer: Customer): void {
-    this.router.navigate([`/customers/${customer.id}`]);
+  loadAllUsers(): void {
+    this.userService.getAllUsers().subscribe(
+      (data: User[]) => this.users = data,
+      (error: any) => console.error(error)
+    );
+  }
+
+  updateUser(user: User): void {
+    this.userService.updateUserDetails(user).subscribe(
+      (updatedUser: User) => {
+        const index = this.users.findIndex(u => u.email === updatedUser.email);
+        if (index !== -1) {
+          this.users[index] = updatedUser;
+        }
+      },
+      (error: any) => console.error(error)
+    );
+  }
+
+  createUser(user: User): void {
+    this.userService.createUser(user).subscribe(
+      (newUser: User) => this.users.push(newUser),
+      (error: any) => console.error(error)
+    );
+  }
+
+  getUserByEmail(email: string): void {
+    this.userService.getUserByEmail(email).subscribe(
+      (user: User) => this.selectedUser = user,
+      (error: any) => console.error(error)
+    );
+  }
+
+  deleteUser(email: string): void {
+    this.userService.deleteUser(email).subscribe(
+      () => this.users = this.users.filter(user => user.email !== email),
+      (error: any) => console.error(error)
+    );
   }
 }
